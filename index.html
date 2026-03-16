@@ -372,6 +372,42 @@
             footer { padding: 24px 20px; flex-direction: column; }
             .hero-divider { gap: 28px; }
         }
+        /* ── Animations ── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero entrance */
+        .hero-mono  { animation: fadeUp 0.6s ease both; animation-delay: 0.05s; }
+        .hero-name  { animation: fadeUp 0.6s ease both; animation-delay: 0.15s; }
+        .hero-sub   { animation: fadeUp 0.6s ease both; animation-delay: 0.25s; }
+        .hero-btns  { animation: fadeUp 0.6s ease both; animation-delay: 0.35s; }
+        .hero-divider { animation: fadeUp 0.6s ease both; animation-delay: 0.48s; }
+
+        /* Scroll reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.55s ease, transform 0.55s ease;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Stagger children */
+        .reveal-stagger > * {
+            opacity: 0;
+            transform: translateY(22px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .reveal-stagger.visible > *:nth-child(1) { opacity:1; transform:translateY(0); transition-delay:0.05s; }
+        .reveal-stagger.visible > *:nth-child(2) { opacity:1; transform:translateY(0); transition-delay:0.13s; }
+        .reveal-stagger.visible > *:nth-child(3) { opacity:1; transform:translateY(0); transition-delay:0.21s; }
+        .reveal-stagger.visible > *:nth-child(4) { opacity:1; transform:translateY(0); transition-delay:0.29s; }
+        .reveal-stagger.visible > *:nth-child(5) { opacity:1; transform:translateY(0); transition-delay:0.37s; }
+        .reveal-stagger.visible > *:nth-child(6) { opacity:1; transform:translateY(0); transition-delay:0.45s; }
     </style>
 </head>
 
@@ -420,18 +456,18 @@
 
     <section id="about">
         <div class="container">
-            <p class="section-label">01 — ABOUT</p>
-            <h2 class="section-title">About Me</h2>
-            <p class="about-text">I'm a <strong>BCA (Hons.) student</strong> at Symbiosis Institute of Computer Studies
+            <p class="section-label reveal">01 — ABOUT</p>
+            <h2 class="section-title reveal">About Me</h2>
+            <p class="about-text reveal">I'm a <strong>BCA (Hons.) student</strong> at Symbiosis Institute of Computer Studies
                 and Research, Pune, specializing in AI and Machine Learning. I enjoy going deep — implementing
                 algorithms <strong>from scratch</strong>, understanding why models behave the way they do, and building
                 tools that work end-to-end.</p>
-            <p class="about-text">From comparing GNNs vs XGBoost on medical datasets to shipping full-stack AI platforms
+            <p class="about-text reveal">From comparing GNNs vs XGBoost on medical datasets to shipping full-stack AI platforms
                 on Vercel — I like the full spectrum from research to deployment. I'm also currently practicing
                 <strong>n8n</strong> for workflow automation. Currently studying in Pune, resident of Lucknow — open to
                 all internship opportunities.
             </p>
-            <div class="edu-list">
+            <div class="edu-list reveal-stagger">
                 <div class="edu-item">
                     <div>
                         <div class="edu-name">BCA (Hons.) — Pursuing</div>
@@ -459,9 +495,9 @@
 
     <section id="skills">
         <div class="container">
-            <p class="section-label">02 — SKILLS</p>
-            <h2 class="section-title">Technical Skills</h2>
-            <div class="skills-grid">
+            <p class="section-label reveal">02 — SKILLS</p>
+            <h2 class="section-title reveal">Technical Skills</h2>
+            <div class="skills-grid reveal-stagger">
                 <div class="skill-card">
                     <div class="skill-card-label">ML / DL</div>
                     <div class="skill-card-title">Machine Learning</div>
@@ -502,9 +538,9 @@
 
     <section id="projects">
         <div class="container">
-            <p class="section-label">03 — PROJECTS</p>
-            <h2 class="section-title">Projects</h2>
-            <div class="projects-list">
+            <p class="section-label reveal">03 — PROJECTS</p>
+            <h2 class="section-title reveal">Projects</h2>
+            <div class="projects-list reveal-stagger">
 
                 <div class="project-card">
                     <div class="project-top">
@@ -584,9 +620,9 @@
 
     <section id="contact">
         <div class="container">
-            <p class="section-label">04 — CONTACT</p>
-            <h2 class="section-title">Get in Touch</h2>
-            <div class="contact-grid">
+            <p class="section-label reveal">04 — CONTACT</p>
+            <h2 class="section-title reveal">Get in Touch</h2>
+            <div class="contact-grid reveal">
                 <div>
                     <p class="contact-intro">Looking for internship opportunities in AI/ML or Data Science. Currently
                         studying in Pune, resident of Lucknow — open to all internship opportunities. Feel free to reach out!</p>
@@ -649,6 +685,51 @@
                 alert('Something went wrong. Please try again.');
             }
         });
+    </script>
+
+    <script>
+        /* ── Scroll reveal ── */
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("visible");
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12 });
+        document.querySelectorAll(".reveal, .reveal-stagger").forEach(el => observer.observe(el));
+
+        /* ── Counter animation ── */
+        function animateCounter(el, target, suffix, duration) {
+            const isFloat = target % 1 !== 0;
+            const start = 0;
+            const startTime = performance.now();
+            function step(now) {
+                const progress = Math.min((now - startTime) / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const val = Math.round(start + (target - start) * eased);
+                el.textContent = val + suffix;
+                if (progress < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const nums = entry.target.querySelectorAll(".stat-num");
+                    const data = [
+                        { target: 5, suffix: "+" },
+                        { target: 83, suffix: "%" },
+                        { target: 2026, suffix: "" }
+                    ];
+                    nums.forEach((el, i) => animateCounter(el, data[i].target, data[i].suffix, 1400));
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.3 });
+        const divider = document.querySelector(".hero-divider");
+        if (divider) statsObserver.observe(divider);
     </script>
 
 </body>
