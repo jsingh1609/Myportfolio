@@ -654,22 +654,22 @@
                 </div>
             </div>
             <div class="reveal reveal-delay-3">
-                <div class="form">
+                <form class="form" action="https://formspree.io/f/mnjgjnkv" method="POST" id="contactForm">
                     <div>
                         <label>YOUR NAME</label>
-                        <input type="text" placeholder="e.g. Jasjeet Singh Babra" id="fname">
+                        <input type="text" name="name" placeholder="e.g. Jasjeet Singh Babra" id="fname" required>
                     </div>
                     <div>
                         <label>EMAIL</label>
-                        <input type="email" placeholder="xyz@company.com" id="femail">
+                        <input type="email" name="email" placeholder="xyz@company.com" id="femail" required>
                     </div>
                     <div>
                         <label>MESSAGE</label>
-                        <textarea placeholder="Tell me about the opportunity..." id="fmsg"></textarea>
+                        <textarea name="message" placeholder="Tell me about the opportunity..." id="fmsg" required></textarea>
                     </div>
-                    <button class="btn-send" onclick="handleSend()">Send Message</button>
+                    <button class="btn-send" type="submit">Send Message</button>
                     <div class="form-success" id="formSuccess">✓ Message sent — I'll get back to you soon!</div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
@@ -720,17 +720,34 @@
     }, { threshold: 0.5 });
     document.querySelectorAll('.stat-num[data-target]').forEach(el => statObserver.observe(el));
 
-    /* form */
-    function handleSend() {
-        const name  = document.getElementById('fname').value.trim();
-        const email = document.getElementById('femail').value.trim();
-        const msg   = document.getElementById('fmsg').value.trim();
-        if (!name || !email || !msg) { alert('Please fill in all fields.'); return; }
-        document.getElementById('formSuccess').style.display = 'block';
-        document.getElementById('fname').value  = '';
-        document.getElementById('femail').value = '';
-        document.getElementById('fmsg').value   = '';
-    }
+    /* form — Formspree */
+    const contactForm = document.getElementById('contactForm');
+    contactForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btn = contactForm.querySelector('.btn-send');
+        btn.textContent = 'Sending...';
+        btn.disabled = true;
+        const data = new FormData(contactForm);
+        try {
+            const res = await fetch('https://formspree.io/f/mnjgjnkv', {
+                method: 'POST',
+                body: data,
+                headers: { 'Accept': 'application/json' }
+            });
+            if (res.ok) {
+                document.getElementById('formSuccess').style.display = 'block';
+                contactForm.reset();
+                btn.textContent = 'Send Message';
+                btn.disabled = false;
+            } else {
+                btn.textContent = 'Try Again';
+                btn.disabled = false;
+            }
+        } catch {
+            btn.textContent = 'Try Again';
+            btn.disabled = false;
+        }
+    });
 </script>
 </body>
 </html>
